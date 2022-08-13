@@ -1,0 +1,56 @@
+:root {
+    --tic-tac-toe-grid-gap: 3px;
+	--tic-tac-toe-grid-width: 500px;
+	--tic-tac-toe-grid-cell-width: calc((var(--tic-tac-toe-grid-width) - var(--tic-tac-toe-grid-gap)*2) / 3);
+}
+
+* {
+	box-sizing: border-box;
+}
+html,
+body {
+	width: 100vw;
+	height: 100vh;
+}
+
+body {
+	margin: 0;
+	background-color: #e2e8f0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.tic-tac-toe-grid {
+	display: grid;
+	grid-template-columns: repeat(3, var(--tic-tac-toe-grid-cell-width));
+    grid-template-rows: repeat(3, var(--tic-tac-toe-grid-cell-width));
+	width: var(--tic-tac-toe-grid-width);
+	height: var(--tic-tac-toe-grid-width);
+	background-color: white;
+	border-radius: 5px;
+	-webkit-box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.5);
+	box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.5);
+    gap: var(--tic-tac-toe-grid-gap);
+}
+
+.grid-cell {
+    box-shadow: 0 0 0 var(--tic-tac-toe-grid-gap) black;
+}
+
+#cell-0 {
+    border-radius: 5px 0px 0px 0px;
+}
+
+#cell-2 {
+    border-radius: 0px 5px 0px 0px;
+}
+
+#cell-6 {
+    border-radius: 0px 0px 0px 5px;
+}
+
+#cell-8 {
+    border-radius: 0px 0px 5px 0px;
+}
