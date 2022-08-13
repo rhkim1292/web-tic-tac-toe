@@ -9,11 +9,29 @@ const gameBoard = (() => {
 		}
 	};
 
-	const getBoardArray = () => {
-		return _boardArray;
-	};
+    const printBoardArray = function () {
+        console.log(_boardArray);
+    };
 
-	return { getBoardArray, initializeBoardArray };
+	return { initializeBoardArray, printBoardArray };
+})();
+
+const gameLogic = (() => {
+    "use strict";
+
+})();
+
+const displayController = (() => {
+    "use strict";
+    const _gameBoardGridElement = document.querySelector(".tic-tac-toe-grid");
+
+    _gameBoardGridElement.addEventListener("click", (e) => {
+        if (e.target.className !== "cell-display") {
+            return;
+        }
+
+        e.target.textContent = "X";
+    });
 })();
 
 const playerFactory = (name) => {
@@ -21,5 +39,4 @@ const playerFactory = (name) => {
 };
 
 gameBoard.initializeBoardArray();
-const player1 = playerFactory("Randy");
-const player2 = playerFactory("Jimmy");
+gameBoard.printBoardArray();
