@@ -62,3 +62,7 @@ body {
     align-items: center;
     height: 100%;
 }
+
+#new-game-btn {
+	display: none;
+}
