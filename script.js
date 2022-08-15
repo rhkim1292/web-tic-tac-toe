@@ -59,7 +59,7 @@ const gameLogic = (() => {
 		return res;
 	};
 	const _winCaseSetArray = _createWinCaseSetArray();
-    const _newGameBtn = document.querySelector("#new-game-btn");
+	const _newGameBtn = document.querySelector("#new-game-btn");
 
 	const _player1 = playerFactory(prompt("Player 1, Enter your name"), 0);
 	const _player2 = playerFactory(prompt("Player 2, Enter your name"), 0);
@@ -103,11 +103,11 @@ const gameLogic = (() => {
 					if (passes === 3) {
 						_gameEnd = true;
 						passes = 0;
-                        if (currSymbolToCheck === "O") {
-                            _player1.wins++;
-                        } else if (currSymbolToCheck === "X") {
-                            _player2.wins++;
-                        }
+						if (currSymbolToCheck === "O") {
+							_player1.wins++;
+						} else if (currSymbolToCheck === "X") {
+							_player2.wins++;
+						}
 						break;
 					}
 					continue;
@@ -135,17 +135,17 @@ const gameLogic = (() => {
 		return _player1.name;
 	};
 
-    const getP1Wins = function () {
-        return _player1.wins;
-    };
+	const getP1Wins = function () {
+		return _player1.wins;
+	};
 
 	const getP2Name = function () {
 		return _player2.name;
 	};
 
-    const getP2Wins = function () {
-        return _player2.wins;
-    };
+	const getP2Wins = function () {
+		return _player2.wins;
+	};
 
 	const lastActionErrored = function () {
 		return _lastActionErrored;
@@ -176,19 +176,19 @@ const gameLogic = (() => {
 		_lastActionErrored = false;
 	});
 
-    _newGameBtn.addEventListener("click", (e) => {
-        _turnsPlayed = 0;
-        _gameEnd = false;
-        _p1Turn = true;
-        _gameTied = false;
-    });
+	_newGameBtn.addEventListener("click", (e) => {
+		_turnsPlayed = 0;
+		_gameEnd = false;
+		_p1Turn = true;
+		_gameTied = false;
+	});
 
 	return {
 		isP1Turn,
 		getP1Name,
-        getP1Wins,
+		getP1Wins,
 		getP2Name,
-        getP2Wins,
+		getP2Wins,
 		lastActionErrored,
 		gameIsTied,
 		gameHasEnded,
@@ -198,7 +198,7 @@ const gameLogic = (() => {
 const displayController = (() => {
 	"use strict";
 	const _playerTurnDisplay = document.querySelector(".player-turn-display");
-    const _newGameBtn = document.querySelector("#new-game-btn");
+	const _newGameBtn = document.querySelector("#new-game-btn");
 	var _gameEnd = false;
 
 	_playerTurnDisplay.textContent = `${gameLogic.getP1Name()}'s Turn!`;
@@ -227,20 +227,24 @@ const displayController = (() => {
 			_playerTurnDisplay.textContent = gameLogic.isP1Turn()
 				? `${gameLogic.getP2Name()} Wins!`
 				: `${gameLogic.getP1Name()} Wins!`;
-            _newGameBtn.style.display = "block"; // Show the New Game button
+
+			_playerTurnDisplay.textContent +=
+                ` Score: ${gameLogic.getP1Name()}: ${gameLogic.getP1Wins()},
+                ${gameLogic.getP2Name()}: ${gameLogic.getP2Wins()}`;
+			_newGameBtn.style.display = "block"; // Show the New Game button
 			_gameEnd = true;
 		}
 
-        _newGameBtn.addEventListener("click", (e) => {
-            // Clear the text content in every cell
-            const gridChildren = Array.from(gameBoard.gridElement.children);
-            gridChildren.forEach((currCell) => {
-                currCell.children[0].textContent = "";
-            });
-            _playerTurnDisplay.textContent = `${gameLogic.getP1Name()}'s Turn!`;
-            _newGameBtn.style.display = "none";
-            _gameEnd = false;
-        });
+		_newGameBtn.addEventListener("click", (e) => {
+			// Clear the text content in every cell
+			const gridChildren = Array.from(gameBoard.gridElement.children);
+			gridChildren.forEach((currCell) => {
+				currCell.children[0].textContent = "";
+			});
+			_playerTurnDisplay.textContent = `${gameLogic.getP1Name()}'s Turn!`;
+			_newGameBtn.style.display = "none";
+			_gameEnd = false;
+		});
 	});
 })();
 
