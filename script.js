@@ -6,104 +6,206 @@ const gameBoard = (() => {
 	"use strict";
 	const _arrayLength = 9;
 	var _array = [];
-    const gridElement = document.querySelector(".tic-tac-toe-grid");
+	const gridElement = document.querySelector(".tic-tac-toe-grid");
 
-	const initializeBoardArray = function () {
+	const initializeArray = function () {
 		for (var i = 0; i < _arrayLength; i++) {
 			_array.push(document.querySelector(`#cell-${i}`));
 		}
 	};
 
-    const printBoardArray = function () {
-        console.log(_array);
-    };
+	const getCurrArray = function () {
+		return _array;
+	};
 
-	return { initializeBoardArray, printBoardArray, gridElement };
+	const getArrayLength = function () {
+		return _arrayLength;
+	};
+
+	return { initializeArray, getCurrArray, getArrayLength, gridElement };
 })();
 
 const gameLogic = (() => {
-    "use strict";
+	"use strict";
 
-    var _p1Turn = true;
-    var _gameEnd = false;
-    var _lastActionErrored = false;
-    const _player1 = playerFactory(prompt("Player 1, Enter your name"), 0);
-    const _player2 = playerFactory(prompt("Player 2, Enter your name"), 0);
+	var _p1Turn = true;
+	var _gameEnd = false;
+	var _gameTied = false;
+	var _lastActionErrored = false;
+	var _turnsPlayed = 0;
+	const _winCases = new Set([
+		[0, 1, 2],
+		[3, 4, 5],
+		[6, 7, 8],
+		[0, 3, 6],
+		[1, 4, 7],
+		[2, 5, 8],
+		[0, 4, 8],
+		[2, 4, 6],
+	]);
+	const _createWinCaseSetArray = function () {
+		var res = [];
 
-    const _switchPlayerTurn = function () {
-        _p1Turn = !_p1Turn;
-    };
+		for (var i = 0; i < gameBoard.getArrayLength(); i++) {
+			res.push(new Set());
+		}
 
-    const _cellIsOccupied = function (selectedCell) {
-        if (selectedCell.className !== "cell-display") {
-            throw "Parameter is not a cell display element!";
-        }
+		for (const currWinCase of _winCases) {
+			currWinCase.forEach((val) => {
+				res[val].add(currWinCase);
+			});
+		}
 
-        if (selectedCell.textContent === "X" || selectedCell.textContent === "O") {
-            return true;
-        } else if (selectedCell.textContent === "") {
-            return false;
-        } else {
-            throw "Unrecognized text content within cell display!";
-        }
-    };
+		return res;
+	};
+	const _winCaseSetArray = _createWinCaseSetArray();
 
-    const isP1Turn = function () {
-        return _p1Turn;
-    };
+	const _player1 = playerFactory(prompt("Player 1, Enter your name"), 0);
+	const _player2 = playerFactory(prompt("Player 2, Enter your name"), 0);
 
-    const getP1Name = function () {
-        return _player1.name;
-    };
+	const _switchPlayerTurn = function () {
+		_p1Turn = !_p1Turn;
+	};
 
-    const getP2Name = function () {
-        return _player2.name;
-    };
+	const _cellIsOccupied = function (selectedCell) {
+		if (selectedCell.className !== "cell-display") {
+			throw "Parameter is not a cell display element!";
+		}
 
-    const lastActionErrored = function () {
-        return _lastActionErrored;
-    }
+		if (
+			selectedCell.textContent === "X" ||
+			selectedCell.textContent === "O"
+		) {
+			return true;
+		} else if (selectedCell.textContent === "") {
+			return false;
+		} else {
+			throw "Unrecognized text content within cell display!";
+		}
+	};
 
-    gameBoard.gridElement.addEventListener("click", (e) => {
-        if (e.target.className !== "cell-display") {
-            return;
-        }
+	const _checkIfGameEnded = function (lastClickedCell) {
+		const currArr = gameBoard.getCurrArray();
+		const setOfWinCases =
+			_winCaseSetArray[currArr.indexOf(lastClickedCell)];
+		var currSymbolToCheck = _p1Turn ? "O" : "X";
+		var passes = 0;
 
-        if (_cellIsOccupied(e.target)) {
-            _lastActionErrored = true;
-            alert("That cell is taken! Pick an empty cell!");
-            return;
-        }
+		for (const winCase of setOfWinCases) {
+			for (const idxOfBoardArrayCell of winCase) {
+				if (
+					currArr.indexOf(lastClickedCell) === idxOfBoardArrayCell ||
+					currArr[idxOfBoardArrayCell].children[0].textContent ===
+						currSymbolToCheck
+				) {
+					passes++;
+					if (passes === 3) {
+						_gameEnd = true;
+						passes = 0;
+						break;
+					}
+					continue;
+				} else if (
+					currArr[idxOfBoardArrayCell].children[0].textContent !==
+					currSymbolToCheck
+				) {
+					passes = 0;
+					break;
+				}
+			}
+		}
 
-        _switchPlayerTurn();
-        _lastActionErrored = false;
-    });
+		if (_turnsPlayed === 9 && !_gameEnd) {
+			_gameEnd = true;
+			_gameTied = true;
+		}
+	};
 
-    return { isP1Turn, getP1Name, getP2Name, lastActionErrored };
+	const isP1Turn = function () {
+		return _p1Turn;
+	};
+
+	const getP1Name = function () {
+		return _player1.name;
+	};
+
+	const getP2Name = function () {
+		return _player2.name;
+	};
+
+	const lastActionErrored = function () {
+		return _lastActionErrored;
+	};
+
+	const gameIsTied = function () {
+		return _gameTied;
+	};
+
+	const gameHasEnded = function () {
+		return _gameEnd;
+	};
+
+	gameBoard.gridElement.addEventListener("click", (e) => {
+		if (e.target.className !== "cell-display" || _gameEnd) {
+			return;
+		}
+
+		if (_cellIsOccupied(e.target)) {
+			_lastActionErrored = true;
+			alert("That cell is taken! Pick an empty cell!");
+			return;
+		}
+
+		_turnsPlayed++;
+		_checkIfGameEnded(e.target.parentElement);
+		_switchPlayerTurn();
+		_lastActionErrored = false;
+	});
+
+	return {
+		isP1Turn,
+		getP1Name,
+		getP2Name,
+		lastActionErrored,
+		gameIsTied,
+		gameHasEnded,
+	};
 })();
 
 const displayController = (() => {
-    "use strict";
-    const _playerTurnDisplay = document.querySelector(".player-turn-display");
+	"use strict";
+	const _playerTurnDisplay = document.querySelector(".player-turn-display");
+	var _gameEnd = false;
 
-    _playerTurnDisplay.textContent = `${gameLogic.getP1Name()}'s Turn!`;
+	_playerTurnDisplay.textContent = `${gameLogic.getP1Name()}'s Turn!`;
 
-    gameBoard.gridElement.addEventListener("click", (e) => {
-        if (e.target.className !== "cell-display") {
-            return;
-        }
+	gameBoard.gridElement.addEventListener("click", (e) => {
+		if (e.target.className !== "cell-display" || _gameEnd) {
+			return;
+		}
 
-        if (!gameLogic.isP1Turn() && !gameLogic.lastActionErrored()) {
-            // Display player 2 since  player 1 just clicked on a cell.
-            _playerTurnDisplay.textContent = `${gameLogic.getP2Name()}'s Turn!`;
-            e.target.textContent = "O";
-        } else if (gameLogic.isP1Turn() && !gameLogic.lastActionErrored()){
-            // Display player 1 since player 2 just clicked on a cell.
-            _playerTurnDisplay.textContent = `${gameLogic.getP1Name()}'s Turn!`;
-            e.target.textContent = "X";
-        }
-    });
+		if (!gameLogic.isP1Turn() && !gameLogic.lastActionErrored()) {
+			// Display player 2 since  player 1 just clicked on a cell.
+			_playerTurnDisplay.textContent = `${gameLogic.getP2Name()}'s Turn!`;
+			e.target.textContent = "O";
+		} else if (gameLogic.isP1Turn() && !gameLogic.lastActionErrored()) {
+			// Display player 1 since player 2 just clicked on a cell.
+			_playerTurnDisplay.textContent = `${gameLogic.getP1Name()}'s Turn!`;
+			e.target.textContent = "X";
+		}
+
+		if (gameLogic.gameHasEnded()) {
+			if (gameLogic.gameIsTied()) {
+				_playerTurnDisplay.textContent = "Game ends in a tie!";
+				_gameEnd = true;
+				return;
+			}
+			_playerTurnDisplay.textContent = gameLogic.isP1Turn()
+				? `${gameLogic.getP2Name()} Wins!`
+				: `${gameLogic.getP1Name()} Wins!`;
+			_gameEnd = true;
+		}
+	});
 })();
 
-gameBoard.initializeBoardArray();
-gameBoard.printBoardArray();
+gameBoard.initializeArray();
